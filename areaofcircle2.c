@@ -38,8 +38,7 @@ int arg1;
 	return 1;
 }
 //positive check for arg1 
-int integer =  sscanf(argv[1], "%d", &arg1);
-  if (integer <= 0) 
+  if (arg1 < 0) 
 {
 	printf("first arg is a negative integer, enter a positive integer\n");
 	return 1;
@@ -53,8 +52,7 @@ int integer =  sscanf(argv[1], "%d", &arg1);
 	return 1;
 }
 //positive check for arg2
-  integer =  sscanf(argv[2], "%d", &arg2);
-  if (integer <= 0) 
+  if (arg2 < 0) 
 {
         printf("second arg is a negative integer, enter a positive integer\n");
         return 1;
