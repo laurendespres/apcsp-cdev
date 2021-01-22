@@ -26,19 +26,19 @@ void createStudent(char* fname, char* lname, int age, int id)
   //  - the firstName and lastName strings should be dynamically created
   //    based on the size of the fname and lname args
 
-Student* st = (students*)malloc(sizeof(students));
+  Student* st = malloc(sizeof(Student));
 
-st->firstName = (char)malloc(strlen(fname)+1)*sizeof(char);
-strcpy(st->firstName,fname);
+  st -> firstName = malloc(strlen(fname)+1);
+  strcpy(st -> firstName, fname);
 
-st->lastName = (char)malloc(strlen(lname)+1)*sizeof(char);
-strcpy(st->lastName,lname);
+  st -> lastName = malloc(strlen(lname) + 1);
+  strcpy(st -> lastName, lname);
 
-st->age = age;
-st->id = id;
+  st -> age = age;
+  st -> id = id;
 
-students[numStudents] = st;
-numStudents++;
+  students[numStudents] = st;
+  numStudents++;
 
 }
 
@@ -47,20 +47,18 @@ void deleteStudent(Student* student)
 {
   // free the memory associated with a student including the strings
 
-free(str->fname);
-free(str->lname);
-}
-free(student);
+free(student -> firstName);
+free(student -> lastName);
 
+free(student);
+}
 void deleteStudents()
 {
   // iterate over the students array deleting every student and setting te pointer
   // values to 0 and adjusting the numStudents to 0
-int size = sizeof(students)/sizeof(int);
 
-for (int i = students[0]; i < size; i++){
-  deleteStudent(students[i]);
-  students[i] = 0;
+for (int i = 0; i < numStudents; i++){
+  deleteStudents(students[i]);
 }
   numStudents = 0;
 }
@@ -77,27 +75,27 @@ void saveStudents(int key)
   // the best way to do this is to convert the student data to a string using sprintf and then
   // (optionally) encrypt the whole string before writing it to disk (see cdemo/fileio3.c)
 
-fp = fopen("studentdata.txt","w");
-char buff[256];
+FILE* fp = fopen(STUFILE, "w");
+if(fp){
 
-if (fp){
-
-int size = sizeof(students)/sizeof(int);
-for (int i = students[0]; i < size; i++){
-
-Student* students =  students[i];
-
-sprintf(buff, "%s %s %d %ld", st->fname, st->lname, st->age, st->id);
-
-if (key != 0){
-  caesarEncrypt(buff, key);
+for(int i = 0; i < numStudents; i++){
+  int keys[1];
+  keys[0]=key;
+  encrypt(students[i]->firstName, keys, 1);
+  encrypt(students[i]->lastName, keys, 1);
+  char ageString[256];
+  char idString[256];
+  sprintf(ageString, "%d", students[i]->age);
+  sprintf(idString, "%ld", students[i]->id);
+  encrypt(ageString, keys, 1);
+  encrypt(idString, keys, 1);
+  printf("saving: %s %s %s %s\n", students[i]->firstName, students[i]->lastName, ageString, idString);
+  fprintf(fp, "%s %s %s %s\n", students[i]->firstName, students[i]->lastName, ageString, idString);
 }
-fprintf(fp, "%s\n", buff);
-
-fclose(fp);
+	printf("saved %d students\n", numStudents);
+	fclose(fp);
 }
 }
-
 
 void loadStudents(int key)
 {
@@ -107,42 +105,43 @@ void loadStudents(int key)
   //    strings
   //  - call createStudent to correctly create the students
 
-if (numStudents > 0){
-	deleteStudents;
- }
-char b1[256];
-char b2[256];
-char b3[256];
-char b4[256];
+FILE* fp = fopen(STUFILE, "r");
+if (fp){
+  char firstName[256];
+  char lastName[256];
+  char ageString[256];
+  char idString[256];
+  int age;
+  long id;
+  int n = 0;
+  numStudents = 0;
+  do{
+	n = fscanf(fp, "%s %s %s %s\n", firstName, lastName, ageString, idString);
+	if(n>0){
 
-
-fp = fopen("studentdata.txt", "r");
-if (fp){ 
- int match = fscanf(fp, "%s %s %s %s\n", b1, b2, b3, b4);
-
-if (match == 4){
-  if (key != 0){
-	caesarDecrypt(b1, key);
-	caesarDecrypt(b2, key);
-	caesarDecrypt(b3, key);
-	caesarDecrypt(b4, key);
+	int keys[1];
+	keys[0]=key;
+	decrypt(firstName, keys, 1);
+	decrypt(lastName, keys, 1);
+	decrypt(ageString, keys, 1);
+	decrypt(idString, keys, 1);
+	sscanf(ageString, "%d", &age);
+	sscanf(idString, "%ld", &id);
+	createStudent(firstName, lastName, age, id);
 }
 }
-int age;
-long id;
-sscanf(b3, "%d", &age);
-sscanf(b4, "%d", &id);
-
-createStudent(b1, b2, age, id); 
+while(n>0);
+fclose(fp);
 }
+}
+
 void printStudent(Student* students)
 {
   printf("  Student: %s %s\n", students->firstName, students->lastName);
   printf("    age: %d\n", students->age);
   printf("    id: %ld\n", students->id); 
 
-fclose(fp);
-}
+
 }
 
 
