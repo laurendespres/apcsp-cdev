@@ -105,6 +105,7 @@ void loadStudents(int key)
   //  - when loading it is best to load data into four strings and then (optionally) decrypt the
   //    strings
   //  - call createStudent to correctly create the students
+deleteStudents();
 
 FILE* fp = fopen(STUFILE, "r");
 if (fp){
