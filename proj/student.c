@@ -89,8 +89,9 @@ for(int i = 0; i < numStudents; i++){
   sprintf(idString, "%ld", students[i]->id);
   encrypt(ageString, keys, 1);
   encrypt(idString, keys, 1);
-  printf("saving: %s %s %s %s\n", students[i]->firstName, students[i]->lastName, ageString, idString);
-  fprintf(fp, "%s %s %s %s\n", students[i]->firstName, students[i]->lastName, ageString, idString);
+ 
+     printf("saving: %s %s %s %s\n", students[i]->firstName, students[i]->lastName, ageString, idString);
+     fprintf(fp, "%s %s %s %s\n", students[i]->firstName, students[i]->lastName, ageString, idString);
 }
 	printf("saved %d students\n", numStudents);
 	fclose(fp);
